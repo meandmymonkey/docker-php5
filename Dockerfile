@@ -22,10 +22,16 @@ RUN \
     curl \
     supervisor
 RUN \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ && \
-    mv /usr/bin/composer.phar /usr/bin/composer
+    mkdir /opt/bin && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/opt/bin/ && \
+    mv /opt/bin/composer.phar /opt/bin/composer
+    
+ENV PATH /opt/bin:$PATH
 
-RUN echo "<?php phpinfo();" > /var/www/index.php && rm /var/www/index.html
+RUN \
+    mkdir -p /var/www/web && \
+    echo "<?php phpinfo();" > /var/www/web/index.php && \
+    rm /var/www/index.html
 
 ADD ./default /etc/nginx/sites-available/default
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf

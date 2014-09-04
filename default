@@ -1,23 +1,20 @@
 server {
-    listen 80 default_server backlog=2048;
+    listen 80 default_server;
 
-    root /var/www;
-    index index.html index.php;
-
-    server_name localhost;
+    server_name _;
+    root /var/www/web;
 
     location / {
-        try_files $uri $uri/ /index.php;
+        try_files $uri /app.php$is_args$args /index.php$is_args$args;
     }
 
     location ~ \.php$ {
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
-
         fastcgi_pass unix:/var/run/php5-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_index index.php;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     }
 
+    error_log /var/log/nginx/project_error.log;
+    access_log /var/log/nginx/project_access.log;
 }
